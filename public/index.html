@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Form</title>
+    <style>
+      body {
+        font-family: "orbitron";
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        text-align: center;
+      }
+
+      .container {
+        max-width: 500px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: green;
+      }
+
+      label {
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      textarea {
+        width: 50%;
+        padding: 8px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      button[type="submit"] {
+        background-color: #4caf50;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Order Form</h1>
+    <form id="orderForm">
+      <label for="name">Name:</label><br />
+      <input type="text" id="name" name="name" required /><br />
+
+      <label for="details">Details:</label><br />
+      <textarea id="details" name="details" required></textarea><br />
+
+      <label for="phoneNo">Phone Number:</label><br />
+      <input type="text" id="phoneNo" name="phoneNo" required /><br />
+
+      <label for="price">Price:</label><br />
+      <input type="number" id="price" name="price" min="0" required /><br />
+      <input type="hidden" id="currentDate" name="currentDate" />
+
+      <button type="submit">Submit Order</button>
+    </form>
+
+    <script>
+      function getCurrentDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        let month = now.getMonth() + 1;
+        let day = now.getDate();
+        month = month < 10 ? "0" + month : month;
+        day = day < 10 ? "0" + day : day;
+
+        return `${year}-${month}-${day}`;
+      }
+
+      document
+        .getElementById("orderForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+          const currentDate = getCurrentDate();
+          formData.set("currentDate", currentDate);
+
+          const requestBody = Object.fromEntries(formData.entries());
+
+          try {
+            const response = await fetch("/order", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestBody),
+            });
+
+            if (response.ok) {
+              const responseData = await response.json();
+              alert(responseData.message);
+            } else {
+              throw new Error("Failed to create order");
+            }
+          } catch (error) {
+            console.error(error);
+            alert("An error occurred. Please try again later.");
+          }
+        });
+    </script>
+  </body>
+</html>
